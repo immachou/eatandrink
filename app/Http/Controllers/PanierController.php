@@ -17,7 +17,7 @@ class PanierController
     public function index()
     {
         $panier = session()->get('panier', []);
-        $products = \App\Models\Product::whereIn('id', array_keys($panier))->get();
+        $products = \App\Models\Produit::whereIn('id', array_keys($panier))->get();
         return view('panier.index', compact('products', 'panier'));
     }
 

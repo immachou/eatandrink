@@ -12,6 +12,64 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
+// Routes d'authentification
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
+
+// Routes de connexion (à implémenter)
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Routes protégées par rôle
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    // Autres routes admin...
+});
+
+Route::middleware(['auth', 'role:entrepreneur_approuve'])->prefix('entrepreneur')->group(function () {
+    Route::get('/dashboard', [EntrepreneurDashboardController::class, 'index'])->name('entrepreneur.dashboard');
+    // Autres routes entrepreneur...
+});
+
+// Routes administrateur
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    // Gestion des stands
+    Route::resource('stands', AdminStandRequestController::class)->only(['index', 'show']);
+    Route::post('stands/{stand}/approuver', [AdminStandRequestController::class, 'approuver'])
+        ->name('stands.approuver');
+    Route::post('stands/{stand}/rejeter', [AdminStandRequestController::class, 'rejeter'])
+        ->name('stands.rejeter');
+});
+
+// Routes pour les entrepreneurs en attente d'approbation
+Route::middleware(['auth', 'role:entrepreneur_en_attente'])->prefix('entrepreneur')->name('entrepreneur.dashboard')->group(function () {
+    Route::get('/dashboard', [EntrepreneurDashboardController::class, 'enAttente'])->name('entrepreneur.dashboard');
+    Route::get('/stand/statut', [EntrepreneurStandRequestController::class, 'status'])->name('stand.status');
+});
+
+// Routes pour les produits (en français)
+Route::middleware(['auth', 'role:entrepreneur_approuve'])->prefix('entrepreneur')->name('entrepreneur.dashboard')->group(function () {
+    // Suppression de la route products en double
+    Route::resource('produits', 'App\Http\Controllers\Entrepreneur\ProductController');
+
+    // Tableau de bord
+    Route::get('/dashboard', [EntrepreneurDashboardController::class, 'index'])->name('dashboard');
+
+    // Gestion des demandes de stand
+    Route::prefix('stand')->name('stand.')->group(function () {
+        Route::get('/demande', [EntrepreneurStandRequestController::class, 'create'])->name('create');
+        Route::post('/demande', [EntrepreneurStandRequestController::class, 'store'])->name('store');
+        Route::get('/statut', [EntrepreneurStandRequestController::class, 'status'])->name('status');
+    });
+});
+Auth::routes();
+
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/exposants', [\App\Http\Controllers\StandController::class, 'index'])->name('stands.index');
 Route::get('/exposants/{stand}', [App\Http\Controllers\StandController::class, 'show'])->name('stands.show');
 Route::post('/panier/ajouter/{product}', [App\Http\Controllers\PanierController::class, 'ajouter'])->name('panier.ajouter');

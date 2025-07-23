@@ -11,15 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
+        Schema::create('utilisateurs', function (Blueprint $table) {
+            $table->id();
+            $table->string('nom_entreprise');
+            $table->string('email')->unique();
+            $table->string('password');
+            $table->enum('role', ['admin', 'entrepreneur_en_attente', 'entrepreneur_approuve'])->default('entrepreneur_en_attente');
+            $table->string('nom_contact')->nullable();
+            $table->string('telephone')->nullable();
+            $table->text('adresse')->nullable();
+            $table->string('siret')->nullable();
+            $table->text('description')->nullable();
+            $table->string('logo_url')->nullable();
+            $table->rememberToken();
+            $table->timestamps();
         });
+
+
     }
+
+
 
     /**
      * Reverse the migrations.
