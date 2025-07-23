@@ -1,68 +1,105 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-4">
-    <h1 class="mb-4">Gestion des Demandes de Stands</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">Gestion des demandes de stand</div>
 
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+                <div class="card-body">
+                    @if(session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                    @endif
 
-    @if(session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
-    @endif
+                    <h4>Demandes en attente</h4>
+                    @if($demandesEnAttente->isEmpty())
+                        <p>Aucune demande en attente pour le moment.</p>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Entreprise</th>
+                                        <th>Contact</th>
+                                        <th>Date de demande</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($demandesEnAttente as $demande)
+                                        <tr>
+                                            <td>{{ $demande->utilisateur->nom_entreprise }}</td>
+                                            <td>
+                                                {{ $demande->utilisateur->nom_contact }}<br>
+                                                {{ $demande->utilisateur->email }}<br>
+                                                {{ $demande->utilisateur->telephone }}
+                                            </td>
+                                            <td>{{ $demande->created_at->format('d/m/Y H:i') }}</td>
+                                            <td>
+                                                <a href="{{ route('admin.stands.show', $demande) }}" class="btn btn-sm btn-info">
+                                                    Voir
+                                                </a>
+                                                <form action="{{ route('admin.stands.approuver', $demande) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-success">
+                                                        Approuver
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('admin.stands.rejeter', $demande) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        Rejeter
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
 
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">Demandes en attente d'approbation</h5>
-            
-            @if($pendingUsers->isEmpty())
-                <p class="text-muted">Aucune demande en attente.</p>
-            @else
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Nom de l'Entreprise</th>
-                                <th>Propriétaire</th>
-                                <th>Email</th>
-                                <th>Téléphone</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($pendingUsers as $user)
+                    <hr>
+
+                    <h4>Historique des demandes</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
                                 <tr>
-                                    <td>{{ $user->entreprise_name }}</td>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->email }}</td>
-                                    <td>{{ $user->phone }}</td>
-                                    <td>
-                                        <form action="{{ route('admin.stands.approve', $user) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir approuver cette demande ?')">
-                                                <i class="fas fa-check"></i> Approuver
-                                            </button>
-                                        </form>
-                                        
-                                        <form action="{{ route('admin.stands.reject', $user) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir rejeter cette demande ?')">
-                                                <i class="fas fa-times"></i> Rejeter
-                                            </button>
-                                        </form>
-                                    </td>
+                                    <th>Entreprise</th>
+                                    <th>Statut</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach($demandesTraitees as $demande)
+                                    <tr>
+                                        <td>{{ $demande->utilisateur->nom_entreprise }}</td>
+                                        <td>
+                                            @if($demande->statut === 'approuve')
+                                                <span class="badge bg-success">Approuvé</span>
+                                            @else
+                                                <span class="badge bg-danger">Rejeté</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $demande->updated_at->format('d/m/Y H:i') }}</td>
+                                        <td>
+                                            <a href="{{ route('admin.stands.show', $demande) }}" class="btn btn-sm btn-info">
+                                                Voir
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        {{ $demandesTraitees->links() }}
+                    </div>
                 </div>
-            @endif
+            </div>
         </div>
     </div>
 </div>

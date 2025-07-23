@@ -3,35 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Stand extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'name',
+        'utilisateur_id',
+        'type',
+        'surface',
         'description',
-        'user_id',
+        'besoins_specifiques',
+        'statut'
     ];
 
-    protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
-    public function user()
+    public function utilisateur(): BelongsTo
     {
-        return $this->belongsTo(User::class);
-    }
-
-    public function products()
-    {
-        return $this->hasMany(Product::class);
-    }
-
-    public function orders()
-    {
-        return $this->hasMany(Order::class);
+        return $this->belongsTo(Utilisateur::class);
     }
 }
