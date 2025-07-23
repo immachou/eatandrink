@@ -35,7 +35,7 @@ Route::middleware(['auth', 'role:entrepreneur_approuve'])->prefix('entrepreneur'
 // Routes administrateur
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    
+
     // Gestion des stands
     Route::resource('stands', AdminStandRequestController::class)->only(['index', 'show']);
     Route::post('stands/{stand}/approuver', [AdminStandRequestController::class, 'approuver'])
@@ -54,10 +54,10 @@ Route::middleware(['auth', 'role:entrepreneur_en_attente'])->prefix('entrepreneu
 Route::middleware(['auth', 'role:entrepreneur_approuve'])->prefix('entrepreneur')->name('entrepreneur.')->group(function () {
     // Suppression de la route products en double
     Route::resource('produits', 'App\Http\Controllers\Entrepreneur\ProductController');
-    
+
     // Tableau de bord
     Route::get('/dashboard', [EntrepreneurDashboardController::class, 'index'])->name('dashboard');
-    
+
     // Gestion des demandes de stand
     Route::prefix('stand')->name('stand.')->group(function () {
         Route::get('/demande', [EntrepreneurStandRequestController::class, 'create'])->name('create');
