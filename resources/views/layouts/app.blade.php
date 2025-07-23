@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -35,3 +36,15 @@
 @stack('scripts')
 </body>
 </html>
+=======
+<nav>
+    <!-- Autres liens -->
+    <a href="{{ route('panier.index') }}" class="ml-4">
+        Panier
+        @php $count = session('panier') ? array_sum(session('panier')) : 0; @endphp
+        @if($count > 0)
+            <span class="bg-blue-500 text-white rounded-full px-2">{{ $count }}</span>
+        @endif
+    </a>
+</nav> 
+>>>>>>> fada0f8ad9e2186b0b03e45d7dfa442e43191154
